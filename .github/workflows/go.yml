@@ -1,7 +1,6 @@
 name: Go
 
 on: [push, workflow_dispatch]
-#on: [workflow_dispatch]
 
 jobs:
   build:
@@ -25,22 +24,17 @@ jobs:
         path: ${{ github.workspace }}/.gocache
         key: ${{ runner.os }}-gocache-file
 
-    #- name: Install go-bindata
-    #  run: |
-    #    go install github.com/kevinburke/go-bindata/go-bindata@v3.24.0
-
     - name: Mod tidy
       run: |
         go mod tidy
 
     - name: Build magneticod
       run: |
-        go build --tags fts5 "-ldflags=-s -w -X main.compiledOn=`date -u +%Y-%m-%dT%H:%M:%SZ`"
+        go build
 
     - name: Build magneticow.exe
       run: |
         GOOS=windows GOARCH=amd64 go build
-        ls -laR
 
     - name: List Package dir
       run: |
@@ -49,6 +43,13 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: magneticos
+        name: magneticos.${{runner.os}}-${{runner.arch}}
         path: |
           magneticos
+
+    - name: Upload artifact windows
+      uses: actions/upload-artifact@v2
+      with:
+        name: magneticos.win64
+        path: |
+          magneticos.exe
